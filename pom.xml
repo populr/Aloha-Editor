@@ -20,7 +20,7 @@
 		<ALOHABUILDCONF>build/aloha</ALOHABUILDCONF>
 		<ALOHADEPLOYMENTURL>NA</ALOHADEPLOYMENTURL>
 		<ALOHADEPLOYMENTPATH>NA</ALOHADEPLOYMENTPATH>
-		<build.profile>build-profile-with-common-extra-plugins</build.profile>
+		<build.profile>build-profile-with-common-plugins</build.profile>
 		<build.license>gpl</build.license>
 		<build.licenseType>GPLv2 or later</build.licenseType>
 		<build.licenseUrl>http://www.gnu.org/licenses/gpl-2.0.html</build.licenseUrl>

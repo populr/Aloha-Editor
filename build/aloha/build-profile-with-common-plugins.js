@@ -40,11 +40,13 @@
 		// We don't include Aloha's patched jquery by default, the user
 		// should do it himself.
 		"jquery": "empty:",
+		// 'jquery': 'vendor/jquery-existing',
     	//"jquery": 'vendor/jquery-1.7.2',
 
 		// We do include Aloha's patched jquery-ui by default, but the
 		// user can override it if he is adventurous.
-		"jqueryui": 'vendor/jquery-ui-1.9.0.custom-aloha',
+		"jqueryui": "empty:",
+		// 'jqueryui': 'vendor/jquery-ui-existing',
 
 		// For the repository browser
 		'PubSub': 'vendor/pubsub/js/pubsub-unminified',
@@ -415,21 +417,21 @@
 
 			include: [
 				// all common plugins
-				"ui/ui-plugin",
-				"link/link-plugin",
-				"table/table-plugin",
-				"format/format-plugin",
-				"list/list-plugin",
-				"image/image-plugin",
-				"highlighteditables/highlighteditables-plugin",
-				"dom-to-xhtml/dom-to-xhtml-plugin",
+				// "ui/ui-plugin",
+				// "link/link-plugin",
+				// "table/table-plugin",
+				// "format/format-plugin",
+				// "list/list-plugin",
+				// "image/image-plugin",
+				// "highlighteditables/highlighteditables-plugin",
+				// "dom-to-xhtml/dom-to-xhtml-plugin",
 				"contenthandler/contenthandler-plugin",
-				"characterpicker/characterpicker-plugin",
+				// "characterpicker/characterpicker-plugin",
 				"commands/commands-plugin",
 				"block/block-plugin",
-				"align/align-plugin",
-				"abbr/abbr-plugin",
-				"horizontalruler/horizontalruler-plugin",
+				// "align/align-plugin",
+				// "abbr/abbr-plugin",
+				// "horizontalruler/horizontalruler-plugin",
 				"undo/undo-plugin",
 				"paste/paste-plugin",
 			],

@@ -794,7 +794,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		return editCommandMethod(command, "action", range, (function (command, showUi, value) {
 			return function () {
 				// "If command is not enabled, return false."
-				if (!myQueryCommandEnabled(command)) {
+				if (!myQueryCommandEnabled(command, range)) {
 					return false;
 				}
 
@@ -3899,9 +3899,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		inlineCommandActivatedValues: ["bold", "600", "700", "800", "900"],
 		relevantCssProperty: "fontWeight",
 		equivalentValues: function (val1, val2) {
-			// "Either the two strings are equal, or one is "bold" and the other is
-			// "700", or one is "normal" and the other is "400"."
-			return val1 == val2 || (val1 == "bold" && val2 == "700") || (val1 == "700" && val2 == "bold") || (val1 == "normal" && val2 == "400") || (val1 == "400" && val2 == "normal");
+			var boldValues = ["bold", "600", "700", "800", "900"];
+			var normalValues = ["normal", "500", "400", "300", "200", "100"];
+			return (boldValues.indexOf(val1) >= 0 && boldValues.indexOf(val2) >= 0) ||
+						(normalValues.indexOf(val1) >= 0 && normalValues.indexOf(val2) >= 0);
 		}
 	};
 
@@ -6389,8 +6390,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// a center."
 		var elementList = getAllContainedNodes(newRange, function (node) {
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-			// Ignoring namespaces here
-				&& (hasAttribute(node, "align") || node.style.textAlign != "" || isNamedHtmlElement(node, 'center'));
+					&& ($_(node).hasClass("text-align-left") ||
+							$_(node).hasClass("text-align-right") ||
+							$_(node).hasClass("text-align-center") ||
+							$_(node).hasClass("text-align-justify"));
 		});
 
 		// "For each element in element list:"
@@ -6402,11 +6405,13 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			// is "align", remove that attribute."
 			element.removeAttribute("align");
 
-			// "Unset the CSS property "text-align" on element, if it's set by a
-			// style attribute."
-			element.style.textAlign = "";
-			if (element.getAttribute("style") == "") {
-				element.removeAttribute("style");
+			// "Remove the aligment class. Remove the class attribute if it is blank."
+			$_(element).removeClass("text-align-left");
+			$_(element).removeClass("text-align-right");
+			$_(element).removeClass("text-align-center");
+			$_(element).removeClass("text-align-justify");
+			if (element.getAttribute("class") == "") {
+				element.removeAttribute("class");
 			}
 
 			// "If element is a div or span or center with no attributes, remove
@@ -6439,7 +6444,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		function makeIsAlignedDiv(alignment) {
 			return function (node) {
 				return isNamedHtmlElement(node, 'div') && $_(node.attributes).every(function (attr) {
-					return (attr.name == "align" && attr.value.toLowerCase() == alignment) || (attr.name == "style" && getStyleLength(node) == 1 && node.style.textAlign == alignment);
+					return attr.name === 'class' && node.attr('class') === 'text-align-' + alignment;
 				});
 			};
 		}
@@ -6447,7 +6452,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		function makeCreateAlignedDiv(alignment) {
 			return function () {
 				var newParent = document.createElement("div");
-				newParent.setAttribute("style", "text-align: " + alignment);
+				newParent.setAttribute("class", "text-align-" + alignment);
 				return newParent;
 			};
 		}
