@@ -40,13 +40,11 @@
 		// We don't include Aloha's patched jquery by default, the user
 		// should do it himself.
 		"jquery": "empty:",
-		// 'jquery': 'vendor/jquery-existing',
     	//"jquery": 'vendor/jquery-1.7.2',
 
 		// We do include Aloha's patched jquery-ui by default, but the
 		// user can override it if he is adventurous.
 		"jqueryui": "empty:",
-		// 'jqueryui': 'vendor/jquery-ui-existing',
 
 		// For the repository browser
 		'PubSub': 'vendor/pubsub/js/pubsub-unminified',

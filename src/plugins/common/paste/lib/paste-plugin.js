@@ -55,7 +55,7 @@ define([
 	 * @type {jQuery.<window>}
 	 * @const
 	 */
-	var $WINDOW = $(window);
+	var $WINDOW = $(Aloha.window);
 
 	/**
 	 * Whether or not the user-agent is Internet Explorer.
@@ -193,7 +193,7 @@ define([
 		return (3 === start.nodeType &&
 				'p' === start.parentNode.nodeName.toLowerCase() &&
 					1 === start.parentNode.childNodes.length &&
-						PROPPING_SPACE.test(window.escape(start.data)));
+						PROPPING_SPACE.test(Aloha.window.escape(start.data)));
 	}
 
 	/**
@@ -277,10 +277,10 @@ define([
 		$event.metaKey = null;
 		$event.stopPropagation();
 
-		// Because yeiling here allows for a small execution window to ensure
+		// Because yeiling here allows for a small execution Aloha.window to ensure
 		// that the pasted content has been inserted into the paste div before
 		// we attempt to retrieve it.
-		window.setTimeout(function () {
+		Aloha.window.setTimeout(function () {
 			paste($CLIPBOARD, range, onInsert);
 			Aloha.activeEditable.smartContentChange($event);
 		}, 10);
@@ -329,7 +329,7 @@ define([
 		settings: {},
 
 		init: function () {
-			$('body').append($CLIPBOARD);
+			$(Aloha.document).find('body').append($CLIPBOARD);
 
 			var hasClipboardAccess = !this.settings.noclipboardaccess;
 
