@@ -31,6 +31,7 @@ function Sanitize(){
   this.config.allow_comments = options.allow_comments ? options.allow_comments : false;
   this.allowed_elements = {};
   this.config.protocols = options.protocols ? options.protocols : {};
+  this.config.css_classes = options.css_classes ? options.css_classes : {};
   this.config.add_attributes = options.add_attributes ? options.add_attributes  : {};
   this.dom = options.dom ? options.dom : document;
   for(i=0;i<this.config.elements.length;i++) {
@@ -138,7 +139,7 @@ Sanitize.prototype.clean_node = function(container) {
   }
   
   function _clean_element(elem) {
-    var i, j, clone, parent_element, name, allowed_attributes, attr, attr_name, attr_node, protocols, del, attr_ok;
+    var i, j, clone, parent_element, name, allowed_attributes, attr, attr_name, attr_node, allowed_protocols, allowed_css_classes, css_classes, css_class, del, attr_ok;
     var transform = _transform_element.call(this, elem);
     var jQuery = this.jQuery;
     var isIE7 = jQuery.browser.msie && jQuery.browser.version === "7.0";
@@ -165,13 +166,21 @@ Sanitize.prototype.clean_node = function(container) {
             attr_ok = true;
             // Check protocol attributes for valid protocol
             if(this.config.protocols[name] && this.config.protocols[name][attr_name]) {
-              protocols = this.config.protocols[name][attr_name];
+              allowed_protocols = this.config.protocols[name][attr_name];
               del = attr.nodeValue.toLowerCase().match(Sanitize.REGEX_PROTOCOL);
               if(del) {
                 attr_ok = (_array_index(del[1], protocols) != -1);
               }
               else {
-                attr_ok = (_array_index(Sanitize.RELATIVE, protocols) != -1);
+                attr_ok = (_array_index(Sanitize.RELATIVE, allowed_protocols) > -1);
+              }
+            } else if (this.config.css_classes[name]) {
+              allowed_css_classes = this.config.css_classes[name];
+              css_classes = attr.nodeValue.split(' ');
+              // stripe divs that have any dis-allowed classes
+              for(var j=0; j < css_classes.length; j++) {
+                css_class = css_classes[j];
+                attr_ok = attr_ok && allowed_css_classes.indexOf(css_class) > -1;
               }
             }
             if(attr_ok) {

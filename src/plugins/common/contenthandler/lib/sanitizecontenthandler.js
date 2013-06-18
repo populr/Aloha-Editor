@@ -69,7 +69,12 @@ function( Aloha, jQuery, ContentHandlerManager, Plugin, console ) {
 			'a' : {'href': ['ftp', 'http', 'https', 'mailto', '__relative__']},
 			'blockquote' : {'cite': ['http', 'https', '__relative__']},
 			'q' : {'cite': ['http', 'https', '__relative__']}
+		},
+
+		css_classes: {
+			'div' : ['text-align-left', 'text-align-right', 'text-align-center', 'text-align-justify']
 		}
+
 	}
 
 	// relaxed sanitize config allows also tables
@@ -106,6 +111,10 @@ function( Aloha, jQuery, ContentHandlerManager, Plugin, console ) {
 			'blockquote': {'cite': ['http', 'https', '__relative__']},
 			'img': {'src' : ['http', 'https', '__relative__']},
 			'q': {'cite': ['http', 'https', '__relative__']}
+		},
+
+		css_classes: {
+			'div' : ['text-align-left', 'text-align-right', 'text-align-center', 'text-align-justify']
 		}
 	}
 
