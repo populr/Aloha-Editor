@@ -78,6 +78,10 @@ function( Aloha, jQuery, ContentHandlerManager, Plugin, console ) {
 			'q' : {'cite': ['http', 'https', '__relative__']}
 		},
 
+		css_classes: {
+			'div' : ['text-align-left', 'text-align-right', 'text-align-center', 'text-align-justify']
+		},
+
 		remove_contents: remove_contents
 	}
 
@@ -115,6 +119,10 @@ function( Aloha, jQuery, ContentHandlerManager, Plugin, console ) {
 			'blockquote': {'cite': ['http', 'https', '__relative__']},
 			'img': {'src' : ['http', 'https', '__relative__']},
 			'q': {'cite': ['http', 'https', '__relative__']}
+		},
+
+		css_classes: {
+			'div' : ['text-align-left', 'text-align-right', 'text-align-center', 'text-align-justify']
 		},
 
 		remove_contents: remove_contents
