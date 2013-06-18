@@ -169,7 +169,7 @@ Sanitize.prototype.clean_node = function(container) {
               allowed_protocols = this.config.protocols[name][attr_name];
               del = attr.nodeValue.toLowerCase().match(Sanitize.REGEX_PROTOCOL);
               if(del) {
-                attr_ok = (_array_index(del[1], protocols) != -1);
+                attr_ok = (_array_index(del[1], allowed_protocols) != -1);
               }
               else {
                 attr_ok = (_array_index(Sanitize.RELATIVE, allowed_protocols) > -1);
