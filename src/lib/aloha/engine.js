@@ -2578,7 +2578,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		}
 
 		// "If command is "createLink" or "unlink":"
-		if (command == "createlink" || command == "unlink") {
+		if (command == "createlink" || command == "createbuttonlink" || command == "unlink") {
 			// "While node is not null, and is not an a element that has an href
 			// attribute, set node to its parent."
 			while (node && (!isAnyHtmlElement(node) || node.tagName != "A" || !hasAttribute(node, "href"))) {
@@ -2703,7 +2703,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		}
 
 		// "If command is "createLink" or "unlink":"
-		if (command == "createlink" || command == "unlink") {
+		if (command == "createlink" || command == "createbuttonlink" || command == "unlink") {
 			// "If element is an a element and has an href attribute, return the
 			// value of that attribute."
 			if (isAnyHtmlElement(element) && element.tagName == "A" && hasAttribute(element, "href")) {
@@ -3004,7 +3004,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 		// "If element is an a element and command is "createLink" or "unlink",
 		// unset the href property of element."
-		if (isNamedHtmlElement(element, 'A') && (command == "createlink" || command == "unlink")) {
+		if (isNamedHtmlElement(element, 'A') && (command == "createlink" || command == "createbuttonlink" || command == "unlink")) {
 			element.removeAttribute("href");
 		}
 
@@ -3161,13 +3161,16 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		}
 
 		// "If command is "createLink" or "unlink":"
-		if (command == "createlink" || command == "unlink") {
+		if (command == "createlink" || command == "createbuttonlink" || command == "unlink") {
 			// "Let new parent be the result of calling createElement("a") on the
 			// ownerDocument of node."
 			newParent = node.ownerDocument.createElement("a");
 
 			// "Set the href attribute of new parent to new value."
 			newParent.setAttribute("href", newValue);
+			if (command == "createbuttonlink") {
+				newParent.setAttribute("class", "link-btn");
+			}
 
 			// "Let ancestor be node's parent."
 			var ancestor = node.parentNode;
@@ -3926,12 +3929,44 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 				$_(getAncestors(node)).forEach(function (ancestor) {
 					if (isEditable(ancestor) && isNamedHtmlElement(ancestor, 'a') && hasAttribute(ancestor, "href")) {
 						ancestor.setAttribute("href", value);
+						ancestor.setAttribute("class", undefined);
 					}
 				});
 			});
 
 			// "Set the selection's value to value."
 			setSelectionValue("createlink", value, range);
+		},
+		standardInlineValueCommand: true
+	};
+
+	//@}
+	///// The createbuttonlink command /////
+	//@{
+	commands.createbuttonlink = {
+		action: function (value, range) {
+			// "If value is the empty string, abort these steps and do nothing."
+			if (value === "") {
+				return;
+			}
+
+			// "For each editable a element that has an href attribute and is an
+			// ancestor of some node effectively contained in the active range, set
+			// that a element's href attribute to value."
+			//
+			// TODO: We don't actually do this in tree order, not that it matters
+			// unless you're spying with mutation events.
+			$_(getAllEffectivelyContainedNodes(getActiveRange())).forEach(function (node) {
+				$_(getAncestors(node)).forEach(function (ancestor) {
+					if (isEditable(ancestor) && isNamedHtmlElement(ancestor, 'a') && hasAttribute(ancestor, "href")) {
+						ancestor.setAttribute("href", value);
+						ancestor.setAttribute("class", "link-btn");
+					}
+				});
+			});
+
+			// "Set the selection's value to value."
+			setSelectionValue("createbuttonlink", value, range);
 		},
 		standardInlineValueCommand: true
 	};
@@ -6390,10 +6425,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// a center."
 		var elementList = getAllContainedNodes(newRange, function (node) {
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& ($_(node).hasClass("text-align-left") ||
-							$_(node).hasClass("text-align-right") ||
-							$_(node).hasClass("text-align-center") ||
-							$_(node).hasClass("text-align-justify"));
+					&& (jQuery(node).hasClass("text-align-left") ||
+							jQuery(node).hasClass("text-align-right") ||
+							jQuery(node).hasClass("text-align-center") ||
+							jQuery(node).hasClass("text-align-justify"));
 		});
 
 		// "For each element in element list:"
@@ -6406,10 +6441,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			element.removeAttribute("align");
 
 			// "Remove the aligment class. Remove the class attribute if it is blank."
-			$_(element).removeClass("text-align-left");
-			$_(element).removeClass("text-align-right");
-			$_(element).removeClass("text-align-center");
-			$_(element).removeClass("text-align-justify");
+			jQuery(element).removeClass("text-align-left");
+			jQuery(element).removeClass("text-align-right");
+			jQuery(element).removeClass("text-align-center");
+			jQuery(element).removeClass("text-align-justify");
 			if (element.getAttribute("class") == "") {
 				element.removeAttribute("class");
 			}
