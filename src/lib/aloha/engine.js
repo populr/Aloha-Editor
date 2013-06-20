@@ -6435,24 +6435,26 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// name is "align", or has a style attribute that sets "text-align", or is
 		// a center."
 		var elementList = getAllContainedNodes(newRange, function (node) {
+			var $element = jQuery(node);
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& (jQuery(node).hasClass("text-align-left") ||
-							jQuery(node).hasClass("text-align-right") ||
-							jQuery(node).hasClass("text-align-center") ||
-							jQuery(node).hasClass("text-align-justify"));
+					&& ($element.hasClass("text-align-left") ||
+							$element.hasClass("text-align-right") ||
+							$element.hasClass("text-align-center") ||
+							$element.hasClass("text-align-justify"));
 		});
 
 		// "For each element in element list:"
 		var i;
 		for (i = 0; i < elementList.length; i++) {
 			var element = elementList[i];
+			var $element = jQuery(element);
 
 			// "If element has an attribute in the HTML namespace whose local name
 			// is "align", remove that attribute."
 			element.removeAttribute("align");
 
 			// "Remove the aligment class. Remove the class attribute if it is blank."
-			jQuery(element).removeClass("text-align-left text-align-right text-align-center text-align-justify");
+			$element.removeClass("text-align-left text-align-right text-align-center text-align-justify");
 			if (element.getAttribute("class") == "") {
 				element.removeAttribute("class");
 			}
@@ -6481,7 +6483,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// is editable; node is an allowed child of "div"; and node's alignment
 		// value is not alignment."
 		nodeList = getContainedNodes(newRange, function (node) {
-			return isEditable(node) && isAllowedChild(node, "div") && getAlignmentValue(node) != alignment;
+			var $element = jQuery(node);
+			// pplr-icon gets centered, so get getAlignmentValue(node) always returns 'center' on pplr-icon elements
+			return ($element.is('i') && $element.hasClass('pplr-icon')) || (isEditable(node) && isAllowedChild(node, "div") && getAlignmentValue(node) != alignment);
 		});
 
 		function makeIsAlignedDiv(alignment) {
