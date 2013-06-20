@@ -4958,21 +4958,13 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 	function getFontSizeValue(node) {
 
-		if (jQuery(node).closest(".font-size--3").length) {
-			return -3;
-		} else if (jQuery(node).closest(".font-size--2").length) {
-			return -2;
-		} else if (jQuery(node).closest(".font-size--1").length) {
-			return -1;
-		} else if (jQuery(node).closest(".font-size-1").length) {
-			return 1;
-		} else if (jQuery(node).closest(".font-size-2").length) {
-			return 2;
-		} else if (jQuery(node).closest(".font-size-3").length) {
-			return 3;
+		if (jQuery(node).closest(".font-size-smaller").length) {
+			return 'smaller';
+		} else if (jQuery(node).closest(".font-size-larger").length) {
+			return 'larger';
 		}
 
-		return 0;
+		return 'normal';
 	}
 
 	//@}
@@ -6579,13 +6571,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 		var elementList = getAllContainedNodes(newRange, function (node) {
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& (node.attributes.length == 0 || (jQuery(node).hasClass("font-size--3") ||
-							jQuery(node).hasClass("font-size--2") ||
-							jQuery(node).hasClass("font-size--1") ||
-							jQuery(node).hasClass("font-size-0") ||
-							jQuery(node).hasClass("font-size-1") ||
-							jQuery(node).hasClass("font-size-2") ||
-							jQuery(node).hasClass("font-size-3")));
+					&& (node.attributes.length == 0 || (jQuery(node).hasClass("font-size-smaller") ||
+							jQuery(node).hasClass("font-size-larger") ||
+							jQuery(node).hasClass("font-size-normal")));
 		});
 
 		// "For each element in element list:"
@@ -6594,7 +6582,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			var element = elementList[i];
 
 			// "Remove the font size class. Remove the class attribute if it is blank."
-			jQuery(element).removeClass("font-size--3 font-size--2 font-size--1 font-size-0 font-size-1 font-size-2 font-size-3");
+			jQuery(element).removeClass("font-size-smaller font-size-larger font-size-normal");
 			if (element.getAttribute("class") == "") {
 				element.removeAttribute("class");
 			}
@@ -6619,7 +6607,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		function makeIsSizedDiv(size) {
 			return function (node) {
 				return isNamedHtmlElement(node, 'div') && $_(node.attributes).every(function (attr) {
-					return attr.name === 'class' && jQuery(node).attr('class') === 'font-size-' + String(size);
+					return attr.name === 'class' && jQuery(node).attr('class') === 'font-size-' + size;
 				});
 			};
 		}
@@ -6627,7 +6615,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		function makeCreateSizedDiv(size) {
 			return function () {
 				var newParent = document.createElement("div");
-				newParent.setAttribute("class", "font-size-" + String(size));
+				newParent.setAttribute("class", "font-size-" + size);
 				return newParent;
 			};
 		}
@@ -8611,28 +8599,27 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 
-
 	//@}
-	///// The fontsizenegative3 command /////
+	///// The fontsizesmaller command /////
 	///// copied from the justifyRight command /////
 	//@{
-	commands.fontsizenegative3 = {
+	commands.fontsizesmaller = {
 		action: function (value, range) {
-			sizeSelection(-3, range);
+			sizeSelection('smaller', range);
 		},
 		indeterm: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == -3; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != -3; });
+			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 'smaller'; })
+				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 'smaller'; });
 		},
 		state: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
 			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == -3;
+				return getFontSizeValue(node) == 'smaller';
 			});
 		},
 		value: function () {
@@ -8642,100 +8629,32 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			if (nodes.length) {
 				return getFontSizeValue(nodes[0]);
 			}
-			return 0;
-		}
-	};
-
-	//@}
-	///// The fontsizenegative2 command /////
-	///// copied from the justifyRight command /////
-	//@{
-	commands.fontsizenegative2 = {
-		action: function (value, range) {
-			sizeSelection(-2, range);
-		},
-		indeterm: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == -2; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != -2; });
-		},
-		state: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == -2;
-			});
-		},
-		value: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			if (nodes.length) {
-				return getFontSizeValue(nodes[0]);
-			}
-			return 0;
-		}
-	};
-
-	//@}
-	///// The fontsizenegative1 command /////
-	///// copied from the justifyRight command /////
-	//@{
-	commands.fontsizenegative1 = {
-		action: function (value, range) {
-			sizeSelection(-1, range);
-		},
-		indeterm: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == -1; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != -1; });
-		},
-		state: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == -1;
-			});
-		},
-		value: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			if (nodes.length) {
-				return getFontSizeValue(nodes[0]);
-			}
-			return 0;
+			return 'normal';
 		}
 	};
 
 
 	//@}
-	///// The fontsize0 command /////
+	///// The fontsizenormal command /////
 	///// copied from the justifyRight command /////
 	//@{
-	commands.fontsize0 = {
+	commands.fontsizenormal = {
 		action: function (value, range) {
-			sizeSelection(0, range);
+			sizeSelection('normal', range);
 		},
 		indeterm: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 0; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 0; });
+			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 'normal'; })
+				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 'normal'; });
 		},
 		state: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
 			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == 0;
+				return getFontSizeValue(node) == 'normal';
 			});
 		},
 		value: function () {
@@ -8745,32 +8664,32 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			if (nodes.length) {
 				return getFontSizeValue(nodes[0]);
 			}
-			return 0;
+			return 'normal';
 		}
 	};
 
 
 	//@}
-	///// The fontsize1 command /////
+	///// The fontsizelarger command /////
 	///// copied from the justifyRight command /////
 	//@{
-	commands.fontsize1 = {
+	commands.fontsizelarger = {
 		action: function (value, range) {
-			sizeSelection(1, range);
+			sizeSelection('larger', range);
 		},
 		indeterm: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 1; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 1; });
+			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 'larger'; })
+				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 'larger'; });
 		},
 		state: function () {
 			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
 				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
 			});
 			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == 1;
+				return getFontSizeValue(node) == 'larger';
 			});
 		},
 		value: function () {
@@ -8780,76 +8699,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			if (nodes.length) {
 				return getFontSizeValue(nodes[0]);
 			}
-			return 0;
-		}
-	};
-
-
-	//@}
-	///// The fontsize2 command /////
-	///// copied from the justifyRight command /////
-	//@{
-	commands.fontsize2 = {
-		action: function (value, range) {
-			sizeSelection(2, range);
-		},
-		indeterm: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 2; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 2; });
-		},
-		state: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == 2;
-			});
-		},
-		value: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			if (nodes.length) {
-				return getFontSizeValue(nodes[0]);
-			}
-			return 0;
-		}
-	};
-
-	//@}
-	///// The fontsize3 command /////
-	///// copied from the justifyRight command /////
-	//@{
-	commands.fontsize3 = {
-		action: function (value, range) {
-			sizeSelection(3, range);
-		},
-		indeterm: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return $_(nodes).some(function (node) { return getFontSizeValue(node) == 3; })
-				&& $_(nodes).some(function (node) { return getFontSizeValue(node) != 3; });
-		},
-		state: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			return nodes.length && $_(nodes).every(function (node) {
-				return getFontSizeValue(node) == 3;
-			});
-		},
-		value: function () {
-			var nodes = getAllContainedNodes(blockExtend(getActiveRange()), function (node) {
-				return isEditable(node) && isVisible(node) && !node.hasChildNodes();
-			});
-			if (nodes.length) {
-				return getFontSizeValue(nodes[0]);
-			}
-			return 0;
+			return 'normal';
 		}
 	};
 
