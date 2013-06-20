@@ -6436,10 +6436,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// a center."
 		var elementList = getAllContainedNodes(newRange, function (node) {
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& (node.attributes.length == 0 || (jQuery(node).hasClass("text-align-left") ||
+					&& (jQuery(node).hasClass("text-align-left") ||
 							jQuery(node).hasClass("text-align-right") ||
 							jQuery(node).hasClass("text-align-center") ||
-							jQuery(node).hasClass("text-align-justify")));
+							jQuery(node).hasClass("text-align-justify"));
 		});
 
 		// "For each element in element list:"
@@ -6571,9 +6571,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 		var elementList = getAllContainedNodes(newRange, function (node) {
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& (node.attributes.length == 0 || (jQuery(node).hasClass("font-size-smaller") ||
+					&& (jQuery(node).hasClass("font-size-smaller") ||
 							jQuery(node).hasClass("font-size-larger") ||
-							jQuery(node).hasClass("font-size-normal")));
+							jQuery(node).hasClass("font-size-normal"));
 		});
 
 		// "For each element in element list:"
