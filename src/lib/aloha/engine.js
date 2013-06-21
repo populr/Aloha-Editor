@@ -6606,8 +6606,11 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		var nodeList = [];
 
 		nodeList = getContainedNodes(newRange, function (node) {
+			var $element = jQuery(node);
       // nodeType of 3 (text) doesn't get any alignment on its own, so always match on it
-			return (node.nodeType === 3) || (isEditable(node) && isAllowedChild(node, "div") && getFontSizeValue(node) != size);
+			// pplr-icon was returning the default size, so this conditional returned false when
+			// the size of the block was not default, causing icons to be wrapped in separate divs
+			return (node.nodeType === 3) || ($element.is('i') && $element.hasClass('pplr-icon')) || (isEditable(node) && isAllowedChild(node, "div") && getFontSizeValue(node) != size);
 		});
 
 		function makeIsSizedDiv(size) {
