@@ -6483,10 +6483,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		// is editable; node is an allowed child of "div"; and node's alignment
 		// value is not alignment."
 		nodeList = getContainedNodes(newRange, function (node) {
-			var $element = jQuery(node);
       // nodeType of 3 (text) doesn't get any alignment on its own, so always match on it
 			// pplr-icon gets centered, so get getAlignmentValue(node) always returns 'center' on pplr-icon elements
-			return (node.nodeType === 3) || ($element.is('i') && $element.hasClass('pplr-icon')) || (isEditable(node) && isAllowedChild(node, "div") && getAlignmentValue(node) != alignment);
+			return (node.nodeType === 3) || jQuery(node).hasClass('pplr-icon') || (isEditable(node) && isAllowedChild(node, "div") && getAlignmentValue(node) != alignment);
 		});
 
 		function makeIsAlignedDiv(alignment) {
@@ -6606,11 +6605,10 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		var nodeList = [];
 
 		nodeList = getContainedNodes(newRange, function (node) {
-			var $element = jQuery(node);
       // nodeType of 3 (text) doesn't get any alignment on its own, so always match on it
 			// pplr-icon was returning the default size, so this conditional returned false when
 			// the size of the block was not default, causing icons to be wrapped in separate divs
-			return (node.nodeType === 3) || ($element.is('i') && $element.hasClass('pplr-icon')) || (isEditable(node) && isAllowedChild(node, "div") && getFontSizeValue(node) != size);
+			return (node.nodeType === 3) || jQuery(node).hasClass('pplr-icon') || (isEditable(node) && isAllowedChild(node, "div") && getFontSizeValue(node) != size);
 		});
 
 		function makeIsSizedDiv(size) {
