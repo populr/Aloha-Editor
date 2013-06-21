@@ -3038,6 +3038,13 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			return;
 		}
 
+		// if this is an icon, don't allow it to be styled (the icons don't
+		// look good bold or italic)
+		if (jQuery(node.parentNode).hasClass('pplr-icon')) {
+			return;
+		}
+
+
 		// "If node is an allowed child of "span":"
 		if (isAllowedChild(node, "span")) {
 			// "Reorder modifiable descendants of node's previousSibling."
