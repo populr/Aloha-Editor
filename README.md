@@ -44,3 +44,10 @@ To get updates you can:
 ## Feeds
  
 - Subscribe to RSS feed updates for the [dev branch](https://github.com/alohaeditor/Aloha-Editor/commits/dev.atom) and/or [master branch](https://github.com/alohaeditor/Aloha-Editor/commits/master.atom)
+
+
+# Build on OSX
+
+    $ mvn clean package -DbareMode=true
+
+See [http://www.aloha-editor.org/guides/develop_aloha.html](http://www.aloha-editor.org/guides/develop_aloha.html).
