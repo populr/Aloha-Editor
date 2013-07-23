@@ -41,16 +41,23 @@ define([
 	 * @return {boolean} True if Aloha supports the current browser.
 	 */
 	function isBrowserSupported() {
-		var browser = $.browser;
-		var version = browser.version;
-		return !(
-			// FF 3.5
-			(browser.mozilla && parseFloat(version) < 1.9) ||
-			// IE 7
-			(browser.msie && version < 7) ||
-			// Right now Opera needs some work
-			(browser.opera && version < 11)
-		);
+	  var browser = $.browser;
+	  var version = browser.version;
+	  return !(
+	          // Chrome/Safari 4
+	          // Because, even though the specific number 532.5 always
+	          // worked for Chrome until now, since jQuery 1.8.x the way
+	          // version numbers are reported for Chrome has changed, so
+	          // we don't know any more. Because we don't know, we'll just
+	          // exclude it.
+	          (browser.webkit && !browser.chrome && parseFloat(version) < 532.5) ||
+	          // FF 3.5
+	          (browser.mozilla && parseFloat(version) < 1.9) ||
+	          // IE 7
+	          (browser.msie && version < 7) ||
+	          // Right now Opera needs some work
+	          (browser.opera && version < 11)
+	  );
 	}
 
 	/**
