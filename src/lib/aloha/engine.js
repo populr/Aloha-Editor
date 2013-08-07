@@ -2451,6 +2451,13 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 			return true;
 		}
 
+
+		// A buttonlink
+		if (node.attributes.length == 2 && node.tagName == "A" && hasAttribute(node, "href") && hasAttribute(node, "class")) {
+			return true;
+		}
+
+
 		// If it's got more than one attribute, everything after this fails.
 		if (node.attributes.length > 1) {
 			return false;
