@@ -143,16 +143,22 @@ Sanitize.prototype.clean_node = function(container) {
     var transform = _transform_element.call(this, elem);
     var jQuery = this.jQuery;
     var isIE7 = jQuery.browser.msie && jQuery.browser.version === "7.0";
-    
+
     elem = transform.node;
     name = elem.nodeName.toLowerCase();
-    
+
+    // remove spans that have no attributes. this is necessary because when copying from an Aloha content editable region
+    // and pasting back into that region, Aloha wraps it in a span and leaves the cursor within that span, so pasting
+    // again results in a nested span. this can cause havoc when subsequently applying and changing block level settings
+    // such as font size (since the spans cause multiple divs to be inserted, which results in unintended line breaks)
+    force_prune = (name == "span" && elem.attributes.length == 0)
+
     // check if element itself is allowed
     parent_element = this.current_element;
-    if(this.allowed_elements[name] || transform.whitelist) {
+    if((this.allowed_elements[name] || transform.whitelist) && !force_prune) {
         this.current_element = this.dom.createElement(elem.nodeName);
         parent_element.appendChild(this.current_element);
-        
+
       // clean attributes
       allowed_attributes = _merge_arrays_uniq(
         this.config.attributes[name],
