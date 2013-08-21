@@ -6459,6 +6459,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 
+		var i, ancestor;
 
 		// if the cursor is inside of an already sized block, but not encompassing that entire block,
 		// we need to remove the containing one or else we get stuck with nested blocks that don't
@@ -6485,7 +6486,6 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 		// "For each element in element list:"
-		var i;
 		for (i = 0; i < elementList.length; i++) {
 			var element = elementList[i];
 			var $element = jQuery(element);
@@ -6622,6 +6622,7 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		});
 
 
+		var i, ancestor;
 
 		// if the cursor is inside of an already sized block, but not encompassing that entire block,
 		// we need to remove the containing one or else we get stuck with nested blocks that don't
@@ -6645,7 +6646,6 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 		// "For each element in element list:"
-		var i;
 		for (i = 0; i < elementList.length; i++) {
 			var element = elementList[i];
 
