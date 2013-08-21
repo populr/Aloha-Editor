@@ -6692,7 +6692,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		function makeCreateSizedDiv(size) {
 			return function () {
 				var newParent = document.createElement("div");
-				newParent.setAttribute("class", "font-size-" + size);
+				if (size != 'normal') {
+					newParent.setAttribute("class", "font-size-" + size);
+				}
 				return newParent;
 			};
 		}
