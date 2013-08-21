@@ -6475,7 +6475,6 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 								$element.hasClass("text-align-center") ||
 								$element.hasClass("text-align-justify"));
           elementList.push(ancestor);
-          console.log(ancestor);
           break;
         }
       }
@@ -6637,7 +6636,6 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
                 jQuery(ancestor).hasClass("font-size-larger") ||
                 jQuery(ancestor).hasClass("font-size-normal"))) {
           elementList.push(ancestor);
-          console.log(ancestor);
           break;
         }
       }
