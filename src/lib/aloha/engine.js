@@ -6457,6 +6457,33 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 							$element.hasClass("text-align-justify"));
 		});
 
+
+
+
+		// if the cursor is inside of an already sized block, but not encompassing that entire block,
+		// we need to remove the containing one or else we get stuck with nested blocks that don't
+		// behave as expected
+    if (newRange.startContainer) {
+      var ancestors = getAncestors(newRange.startContainer);
+      ancestors.unshift(newRange.startContainer);
+      for (i = 0; i < ancestors.length; i++) {
+        ancestor = ancestors[i];
+        if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
+						&& ($element.hasClass("text-align-left") ||
+								$element.hasClass("text-align-right") ||
+								$element.hasClass("text-align-center") ||
+								$element.hasClass("text-align-justify"));
+          elementList.push(ancestor);
+          console.log(ancestor);
+          break;
+        }
+      }
+    }
+
+
+
+
+
 		// "For each element in element list:"
 		var i;
 		for (i = 0; i < elementList.length; i++) {
@@ -6593,6 +6620,29 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 							jQuery(node).hasClass("font-size-larger") ||
 							jQuery(node).hasClass("font-size-normal"));
 		});
+
+
+
+		// if the cursor is inside of an already sized block, but not encompassing that entire block,
+		// we need to remove the containing one or else we get stuck with nested blocks that don't
+		// behave as expected
+    if (newRange.startContainer) {
+      var ancestors = getAncestors(newRange.startContainer);
+      ancestors.unshift(newRange.startContainer);
+      for (i = 0; i < ancestors.length; i++) {
+        ancestor = ancestors[i];
+        if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
+            && (jQuery(ancestor).hasClass("font-size-smaller") ||
+                jQuery(ancestor).hasClass("font-size-larger") ||
+                jQuery(ancestor).hasClass("font-size-normal"))) {
+          elementList.push(ancestor);
+          console.log(ancestor);
+          break;
+        }
+      }
+    }
+
+
 
 		// "For each element in element list:"
 		var i;
