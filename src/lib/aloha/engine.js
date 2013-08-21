@@ -6460,27 +6460,28 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 
-    var i;
-    var ancestor;
+		var i;
+		var ancestor;
 
-    // if the cursor is inside of an already sized block, but not encompassing that entire block,
-    // we need to remove the containing one or else we get stuck with nested blocks that don't
-    // behave as expected
-    if (newRange.startContainer) {
-      var ancestors = getAncestors(newRange.startContainer);
-      ancestors.unshift(newRange.startContainer);
-      for (i = 0; i < ancestors.length; i++) {
-        ancestor = ancestors[i];
-        if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
-            && ($element.hasClass("text-align-left") ||
-                $element.hasClass("text-align-right") ||
-                $element.hasClass("text-align-center") ||
-                $element.hasClass("text-align-justify"))) {
-          elementList.push(ancestor);
-          break;
-        }
-      }
-    }
+		// if the cursor is inside of an already sized block, but not encompassing that entire block,
+		// we need to remove the containing one or else we get stuck with nested blocks that don't
+		// behave as expected
+		if (newRange.startContainer) {
+			var ancestors = getAncestors(newRange.startContainer);
+			ancestors.unshift(newRange.startContainer);
+			for (i = 0; i < ancestors.length; i++) {
+				ancestor = ancestors[i];
+				var $ancestor = jQuery(ancestor);
+				if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
+						&& ($ancestor.hasClass("text-align-left") ||
+								$ancestor.hasClass("text-align-right") ||
+								$ancestor.hasClass("text-align-center") ||
+								$ancestor.hasClass("text-align-justify"))) {
+				elementList.push(ancestor);
+				break;
+				}
+			}
+		}
 
 
 
@@ -6615,35 +6616,37 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		var newRange = blockExtend(range);
 
 		var elementList = getAllContainedNodes(newRange, function (node) {
+			var $element = jQuery(node);
 			return node.nodeType == $_.Node.ELEMENT_NODE && isEditable(node)
-					&& (jQuery(node).hasClass("font-size-smaller") ||
-							jQuery(node).hasClass("font-size-larger") ||
-							jQuery(node).hasClass("font-size-normal"));
+					&& ($element.hasClass("font-size-smaller") ||
+							$element.hasClass("font-size-larger") ||
+							$element.hasClass("font-size-normal"));
 		});
 
 
 
 
-    var i;
-    var ancestor;
+		var i;
+		var ancestor;
 
-    // if the cursor is inside of an already sized block, but not encompassing that entire block,
-    // we need to remove the containing one or else we get stuck with nested blocks that don't
-    // behave as expected
-    if (newRange.startContainer) {
-      var ancestors = getAncestors(newRange.startContainer);
-      ancestors.unshift(newRange.startContainer);
-      for (i = 0; i < ancestors.length; i++) {
-        ancestor = ancestors[i];
-        if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
-            && (jQuery(ancestor).hasClass("font-size-smaller") ||
-                jQuery(ancestor).hasClass("font-size-larger") ||
-                jQuery(ancestor).hasClass("font-size-normal"))) {
-          elementList.push(ancestor);
-          break;
-        }
-      }
-    }
+		// if the cursor is inside of an already sized block, but not encompassing that entire block,
+		// we need to remove the containing one or else we get stuck with nested blocks that don't
+		// behave as expected
+		if (newRange.startContainer) {
+			var ancestors = getAncestors(newRange.startContainer);
+			ancestors.unshift(newRange.startContainer);
+			for (i = 0; i < ancestors.length; i++) {
+				ancestor = ancestors[i];
+				var $ancestor = jQuery(ancestor);
+				if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
+						&& ($ancestor.hasClass("font-size-smaller") ||
+								$ancestor.hasClass("font-size-larger") ||
+								$ancestor.hasClass("font-size-normal"))) {
+					elementList.push(ancestor);
+					break;
+				}
+			}
+		}
 
 
 
