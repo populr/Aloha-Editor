@@ -6477,8 +6477,8 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 								$ancestor.hasClass("text-align-right") ||
 								$ancestor.hasClass("text-align-center") ||
 								$ancestor.hasClass("text-align-justify"))) {
-				elementList.push(ancestor);
-				break;
+					elementList.push(ancestor);
+					break;
 				}
 			}
 		}
