@@ -6459,27 +6459,28 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 
 
 
-		var i, ancestor;
 
-		// if the cursor is inside of an already sized block, but not encompassing that entire block,
-		// we need to remove the containing one or else we get stuck with nested blocks that don't
-		// behave as expected
+    var i;
+    var ancestor;
+
+    // if the cursor is inside of an already sized block, but not encompassing that entire block,
+    // we need to remove the containing one or else we get stuck with nested blocks that don't
+    // behave as expected
     if (newRange.startContainer) {
       var ancestors = getAncestors(newRange.startContainer);
       ancestors.unshift(newRange.startContainer);
       for (i = 0; i < ancestors.length; i++) {
         ancestor = ancestors[i];
         if (ancestor.nodeType == $_.Node.ELEMENT_NODE && isEditable(ancestor)
-						&& ($element.hasClass("text-align-left") ||
-								$element.hasClass("text-align-right") ||
-								$element.hasClass("text-align-center") ||
-								$element.hasClass("text-align-justify"));
+            && ($element.hasClass("text-align-left") ||
+                $element.hasClass("text-align-right") ||
+                $element.hasClass("text-align-center") ||
+                $element.hasClass("text-align-justify"))) {
           elementList.push(ancestor);
           break;
         }
       }
     }
-
 
 
 
@@ -6621,11 +6622,14 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
 		});
 
 
-		var i, ancestor;
 
-		// if the cursor is inside of an already sized block, but not encompassing that entire block,
-		// we need to remove the containing one or else we get stuck with nested blocks that don't
-		// behave as expected
+
+    var i;
+    var ancestor;
+
+    // if the cursor is inside of an already sized block, but not encompassing that entire block,
+    // we need to remove the containing one or else we get stuck with nested blocks that don't
+    // behave as expected
     if (newRange.startContainer) {
       var ancestors = getAncestors(newRange.startContainer);
       ancestors.unshift(newRange.startContainer);
@@ -6640,6 +6644,9 @@ define(['aloha/core', 'aloha/ecma5shims', 'util/maps', 'util/dom2', 'util/html',
         }
       }
     }
+
+
+
 
 
 
