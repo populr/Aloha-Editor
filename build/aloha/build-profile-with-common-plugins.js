@@ -430,7 +430,7 @@
 				// "align/align-plugin",
 				// "abbr/abbr-plugin",
 				// "horizontalruler/horizontalruler-plugin",
-				// "undo/undo-plugin",
+				"undo/undo-plugin",
 				"paste/paste-plugin",
 			],
         },
