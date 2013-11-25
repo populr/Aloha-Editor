@@ -37,6 +37,7 @@ define([
 	'aloha/ephemera',
 	'util/dom2',
 	'util/html',
+	'util/browser',
 	'PubSub',
 	'aloha/copypaste',
 	'aloha/command',
@@ -55,6 +56,7 @@ define([
 	Ephemera,
 	Dom,
 	Html,
+	Browser,
 	PubSub,
 	CopyPaste,
 	Command,
@@ -205,6 +207,58 @@ define([
 		Engine.deleteContents(range, {stripWrappers: false});
 		Aloha.trigger('aloha-command-executed', 'delete');
 	}
+
+	/**
+	 * Because on mobile devices we don't get a click/key event when the
+	 * user presses the "Select" or "Select All" above the cursor, and
+	 * therfore the normal check in the contentEditableSelectionChange
+	 * will not detect a selection change..
+	 */
+	function setupGlobalSelectionChangeHandler() {
+		// Because we don't want to affect IE performance (which is very
+		// bad already) in any way, we don't do it for IE (not sure
+		// wether we need to support IE on mobile devices).
+		if (Browser.ie) {
+			return;
+		}
+		// Because we don't want to alter any existing Aloha selection
+		// behaviour (which is very fickle), we only fire the event if
+		// it really changed.
+		var prevRange = null;
+		function checkSelectionChange() {
+			if (!Aloha.activeEditable) {
+				return;
+			}
+			var selection = Aloha.getSelection();
+			if (!selection.getRangeCount()) {
+				if (null != prevRange) {
+					prevRange = null;
+					Selection.onChange();
+				}
+			} else {
+				var range = selection.getRangeAt(0);
+				if (null == prevRange || !Dom.areRangesEq(range, prevRange)) {
+					prevRange = range;
+					var editableElem = Aloha.activeEditable.obj[0];
+					if (Dom.contains(editableElem, range.startContainer)
+					        || editableElem === range.startContainer) {
+						Selection.onChange();
+					}
+				}
+			}
+		}
+		$(document).bind('selectionchange', function () {
+			// Because handling the selectionchange event has recently
+			// been added only to handle select events on mobile
+			// devices, and some selection change handlers may need the
+			// events from mouse clicks or key presses to be passed to
+			// Selection.onChange() we first wait a little for the other
+			// events to happen.
+			setTimeout(checkSelectionChange, 0);
+		});
+	}
+
+	setupGlobalSelectionChangeHandler();
 
 	/**
 	 * Editable object
@@ -657,7 +711,7 @@ define([
 			// initialize the object and disable contentEditable
 			// unbind all events
 			// TODO should only unbind the specific handlers.
-			this.obj.removeClass('aloha-editable').contentEditable(false).unbind('mousedown click dblclick focus keydown keypress keyup');
+			this.obj.removeClass('aloha-editable').contentEditable(false).unbind('mousedown click dblclick focus keydown keypress keyup .contentEditableSelectionChange');
 
 			/* TODO remove this event, it should implemented as bind and unbind
 			// register the onSelectionChange Event with the Editable field
@@ -814,6 +868,11 @@ define([
 			 */
 			Aloha.trigger('aloha-editable-deactivated', {
 				editable: this
+			});
+			PubSub.pub('aloha.editable.deactivated', {
+				data: {
+					editable: this
+				}
 			});
 
 			/**

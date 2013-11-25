@@ -1,7 +1,7 @@
 /* paste-plugin.js is part of Aloha Editor project http://aloha-editor.org
  *
  * Aloha Editor is a WYSIWYG HTML5 inline editing library and editor.
- * Copyright (c) 2010-2012 Gentics Software GmbH, Vienna, Austria.
+ * Copyright (c) 2010-2013 Gentics Software GmbH, Vienna, Austria.
  * Contributors http://aloha-editor.org/contribution.php
  *
  * Aloha Editor is free software; you can redistribute it and/or
@@ -83,10 +83,14 @@ define([
 	 * In order to hide the editable div we use clip:rect for WebKit (Chrome,
 	 * Safari) and Trident (IE), and width/height for Gecko (FF).
 	 *
+	 * We put a tabindex="-1" on the div that will become
+	 * contenteditable so we don't mess with the
+	 * browser's/mobile-webview's tab/next functionality.
+	 *
 	 * @type {jQuery.<HTMLElement>}
 	 * @const
 	 */
-	var $CLIPBOARD = $('<div style="position:absolute; ' +
+	var $CLIPBOARD = $('<div tabindex="-1" style="position:absolute; ' +
 	                   'clip:rect(0px,0px,0px,0px); ' +
 	                   'width:1px; height:1px;"></div>').contentEditable(true);
 
@@ -96,6 +100,19 @@ define([
 	 * @type {WrappedRange}
 	 */
 	var ieRangeBeforePaste = null;
+
+	/**
+	 * The window's scroll position at the moment just before pasting is done
+	 * (beforepaste and paste events).
+	 *
+	 * @type {object}
+	 * @property {Number} x
+	 * @property {Number} y
+	 **/
+	var scrollPositionBeforePaste = {
+		x: 0,
+		y: 0
+	};
 
 	/**
 	 * Set the selection to the given range and focus on the editable inwhich
@@ -112,6 +129,10 @@ define([
 			editable.obj.focus();
 		}
 		CopyPaste.setSelectionAt(range);
+		window.scrollTo(
+			scrollPositionBeforePaste.x,
+			scrollPositionBeforePaste.y
+		);
 	}
 
 	/**
@@ -130,12 +151,15 @@ define([
 	 *                                       is to be directed to.
 	 */
 	function redirect(range, $target) {
+		var width = 200;
 		// Because moving the target element to the current scroll position
 		// avoids jittering the viewport when the pasted content moves between
 		// where the range is and target.
 		$target.css({
 			top: $WINDOW.scrollTop(),
-			left: $WINDOW.scrollLeft() - 200 // Why 200?
+			left: $WINDOW.scrollLeft() - width,
+			width: width,
+			overflow: 'hidden'
 		}).contents().remove();
 
 		var from = CopyPaste.getEditableAt(range);
@@ -198,7 +222,7 @@ define([
 
 	/**
 	 * Prepare the nodes around where pasted content is to land.
-	 * 
+	 *
 	 * @param {WrappedRange} range
 	 */
 	function prepRangeForPaste(range) {
@@ -307,12 +331,22 @@ define([
 		// if (IS_IE && !hasClipboardAccess) {
 		if (IS_IE) {
 			$editable.bind('beforepaste', function ($event) {
+				scrollPositionBeforePaste.x = window.scrollX ||
+					document.documentElement.scrollLeft;
+				scrollPositionBeforePaste.y = window.scrollY ||
+					document.documentElement.scrollTop;
+
 				ieRangeBeforePaste = CopyPaste.getRange();
 				redirect(ieRangeBeforePaste, $CLIPBOARD);
 				$event.stopPropagation();
 			});
 		} else {
 			$editable.bind('paste', function ($event) {
+				scrollPositionBeforePaste.x = window.scrollX ||
+					document.documentElement.scrollLeft;
+				scrollPositionBeforePaste.y = window.scrollY ||
+					document.documentElement.scrollTop;
+
 				var range = CopyPaste.getRange();
 				redirect(range, $CLIPBOARD);
 				if (IS_IE) {

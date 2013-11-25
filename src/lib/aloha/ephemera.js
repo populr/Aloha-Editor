@@ -96,6 +96,7 @@ define([
 			'aloha-ephemera-filler': true,
 			'aloha-ephemera-attr': true,
 			'aloha-ephemera': true,
+			'aloha-anchor-first': true,
 			// aloha-cleanme is the same as aloha-ephemera.
 			// TODO: should be replaced with aloha-ephemera throughout
 			//       the codebase and removed here.
@@ -392,17 +393,20 @@ define([
 	 */
 	function pruneElem(elem, emap) {
 		var className = elem.className;
-		if (className && -1 !== className.indexOf(commonClsSubstr)) {
+		// Because for SVG elements, elem.className may be an object.
+		if ('string' === typeof className && -1 !== className.indexOf(commonClsSubstr)) {
 			var classes = Strings.words(className);
 
 			// Ephemera.markElement()
-			if (-1 !== Arrays.indexOf(classes, 'aloha-cleanme') || -1 !== Arrays.indexOf(classes, 'aloha-ephemera')) {
+			if (-1 !== Arrays.indexOf(classes, 'aloha-cleanme')
+				    || -1 !== Arrays.indexOf(classes, 'aloha-ephemera')) {
 				$.removeData(elem); // avoids memory leak
 				return false; // removes the element
 			}
 
 			// Ephemera.markWrapper() and Ephemera.markFiller()
-			if (-1 !== Arrays.indexOf(classes, 'aloha-ephemera-wrapper') || -1 !== Arrays.indexOf(classes, 'aloha-ephemera-filler')) {
+			if (-1 !== Arrays.indexOf(classes, 'aloha-ephemera-wrapper')
+				    || -1 !== Arrays.indexOf(classes, 'aloha-ephemera-filler')) {
 				Dom.moveNextAll(elem.parentNode, elem.firstChild, elem.nextSibling);
 				$.removeData(elem);
 				return false;

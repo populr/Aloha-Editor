@@ -640,7 +640,12 @@ define([
 	function contains(a, b) {
 		return (1 === a.nodeType
 				? (a.contains
-				   ? a != b && a.contains(b)
+				   ? (a !== b
+					  // Because IE returns false for elemNode.contains(textNode).
+					  && (1 === b.nodeType
+						  ? a.contains(b)
+						  : (b.parentNode
+							 && (a === b.parentNode || a.contains(b.parentNode)))))
 				   : !!(a.compareDocumentPosition(b) & 16))
 				: false);
 	}
@@ -1135,17 +1140,17 @@ define([
 	 * @param node should be an element node.
 	 */
 	function getComputedStyle(node, name) {
-		if (node.currentStyle) {
-			// Because IE7 needs dashesToCamelCase().
-			name = Strings.dashesToCamelCase(name);
-			return node.currentStyle[name];
-		}
 		var doc = node.ownerDocument;
-		if (doc.defaultView && doc.defaultView.getComputedStyle) {
+		if (doc && doc.defaultView && doc.defaultView.getComputedStyle) {
 			var styles = doc.defaultView.getComputedStyle(node, null);
 			if (styles) {
 				return styles[name] || styles.getPropertyValue(name);
 			}
+		}
+		if (node.currentStyle) {
+			// Because IE7 needs dashesToCamelCase().
+			name = Strings.dashesToCamelCase(name);
+			return node.currentStyle[name];
 		}
 		return null;
 	}
@@ -1187,8 +1192,16 @@ define([
 							 Strings.empty);
 	}
 
-	function ensureCursorInsideElem(cursor, oppositeCursor, elem, back) {
-		if (contains(elem, cursor.node)) {
+	function isCursorContainedByElem(cursor, elem) {
+		return contains(elem, cursor.node) || elem === cursor.parent();
+	}
+
+	function isBoundaryPointContainedByElem(node, offset, elem) {
+		return isCursorContainedByElem(cursorFromBoundaryPoint(node, offset), elem);
+	}
+
+	function ensureCursorContainedByElem(cursor, oppositeCursor, elem, back) {
+		if (isCursorContainedByElem(cursor, elem)) {
 			return true;
 		}
 		while (!cursor.equals(oppositeCursor)
@@ -1200,16 +1213,22 @@ define([
 		return false;
 	}
 
-	function ensureRangeInsideElem(range, elem) {
+	function ensureRangeContainedByElem(range, elem) {
 		var startCursor = cursorFromBoundaryPoint(range.startContainer, range.startOffset);
 		var endCursor = cursorFromBoundaryPoint(range.endContainer, range.endOffset);
-		var startInside = ensureCursorInsideElem(startCursor, endCursor, elem, false);
-		var endInside = ensureCursorInsideElem(endCursor, startCursor, elem, true);
+		var moveStart = !isCursorContainedByElem(startCursor, elem);
+		var moveEnd = !isCursorContainedByElem(endCursor, elem);
+		var startInside = ensureCursorContainedByElem(startCursor, endCursor, elem, false);
+		var endInside = ensureCursorContainedByElem(endCursor, startCursor, elem, true);
 		if (!startInside || !endInside) {
 			return false;
 		}
-		setRangeStartFromCursor(range, startCursor);
-		setRangeEndFromCursor(range, endCursor);
+		if (moveStart) {
+			setRangeStartFromCursor(range, startCursor);
+		}
+		if (moveEnd) {
+			setRangeEndFromCursor(range, endCursor);
+		}
 		return true;
 	}
 
@@ -1270,6 +1289,8 @@ define([
 		getStyle: getStyle,
 		getComputedStyle: getComputedStyle,
 		hasAttrs: hasAttrs,
-		ensureRangeInsideElem: ensureRangeInsideElem
+		ensureRangeContainedByElem: ensureRangeContainedByElem,
+		isBoundaryPointContainedByElem: isBoundaryPointContainedByElem,
+		nodeLength: nodeLength
 	};
 });

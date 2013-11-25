@@ -25,10 +25,14 @@
  * recipients can access the Corresponding Source.
  */
 define([
+	'jquery',
 	'util/dom2',
+	'util/dom',
 	'util/maps',
 	'util/arrays'
 ], function (
+	jQuery,
+	Dom2,
 	Dom,
 	Maps,
 	Arrays
@@ -76,7 +80,7 @@ define([
 	 * works if the given node is attached to the document.
 	 */
 	function hasBlockStyle(node) {
-		return node && ((node.nodeType == 1 && !nonBlockDisplayValuesMap[Dom.getComputedStyle(node, 'display')])
+		return node && ((node.nodeType == 1 && !nonBlockDisplayValuesMap[Dom2.getComputedStyle(node, 'display')])
 						|| node.nodeType == 9
 						|| node.nodeType == 11);
 	}
@@ -169,6 +173,89 @@ define([
 		'video'      // HTML5
 	];
 
+
+	/**
+	 * Unicode zero width space characters:
+	 * http://www.unicode.org/Public/UNIDATA/Scripts.txt
+	 *
+	 * @const
+	 * @type {Array.<string>}
+	 */
+	var ZERO_WIDTH_CHARACTERS = [
+		'\\u200B', // ZWSP
+		'\\u200C',
+		'\\u200D',
+		'\\uFEFF'  // ZERO WIDTH NO-BREAK SPACE
+	];
+
+	/**
+	 * Unicode White_Space characters are those that have the Unicode property
+	 * "White_Space" in the Unicode PropList.txt data file.
+	 *
+	 * http://www.unicode.org/Public/UNIDATA/PropList.txt
+	 *
+	 * @const
+	 * @type {Array.<string>}
+	 */
+	var WHITE_SPACE_CHARACTERS_UNICODES = [
+		'\\u0009',
+		'\\u000A',
+		'\\u000B',
+		'\\u000C',
+		'\\u000D',
+		'\\u0020',
+		'\\u0085',
+		'\\u00A0', // NON BREAKING SPACE ("&nbsp;")
+		'\\u1680',
+		'\\u180E',
+		'\\u2000',
+		'\\u2001',
+		'\\u2002',
+		'\\u2003',
+		'\\u2004',
+		'\\u2005',
+		'\\u2006',
+		'\\u2007',
+		'\\u2008',
+		'\\u2009',
+		'\\u200A',
+		'\\u2028',
+		'\\u2029',
+		'\\u202F',
+		'\\u205F',
+		'\\u3000'
+	];
+
+	var wspChars = WHITE_SPACE_CHARACTERS_UNICODES.join('');
+
+	/**
+	 * Regular expression that matches one or more sequences of white space
+	 * characters.
+	 *
+	 * @type {RegExp}
+	 */
+	var WSP_CHARACTERS = new RegExp('[' + wspChars + ']+');
+	var WSP_CHARACTERS_LEFT = new RegExp('^[' + wspChars + ']+');
+	var WSP_CHARACTERS_RIGHT = new RegExp('[' + wspChars + ']+$');
+
+	/**
+	 * Regular expression that matches one or more sequences of zero width
+	 * characters.
+	 *
+	 * @type {RegExp}
+	 */
+	var ZWSP_CHARACTERS = new RegExp('[' + ZERO_WIDTH_CHARACTERS.join('') + ']+');
+	var ZWSP_CHARACTERS_LEFT = new RegExp('^[' + ZERO_WIDTH_CHARACTERS.join('') + ']+');
+	var ZWSP_CHARACTERS_RIGHT = new RegExp('[' + ZERO_WIDTH_CHARACTERS.join('') + ']+$');
+
+	function isWSPorZWSPText(text) {
+		return WSP_CHARACTERS.test(text) || ZWSP_CHARACTERS.test(text);
+	}
+
+	function isWSPorZWSPNode(node) {
+		return 3 === node.nodeType && isWSPorZWSPText(node.data);
+	}
+
 	/**
 	 * Map containing lowercase and uppercase tagnames of block element as keys
 	 * mapped against true.
@@ -219,7 +306,7 @@ define([
 		if (nonWhitespaceRx.test(node.nodeValue)) {
 			return false;
 		}
-        var cssWhiteSpace = Dom.getComputedStyle(node.parentNode, 'white-space');
+        var cssWhiteSpace = Dom2.getComputedStyle(node.parentNode, 'white-space');
 		if (isWhiteSpacePreserveStyle(cssWhiteSpace)) {
 			return false;
 		}
@@ -354,7 +441,7 @@ define([
 			return false;
 		}
 		// Algorithm like engine.js isCollapsedWhitespaceNode().
-		return skipUnrenderedToEndOfLine(Dom.cursor(node, false)) || skipUnrenderedToStartOfLine(Dom.cursor(node, false));
+		return skipUnrenderedToEndOfLine(Dom2.cursor(node, false)) || skipUnrenderedToStartOfLine(Dom2.cursor(node, false));
 	}
 
 	/**
@@ -414,6 +501,13 @@ define([
 		return true;
 	}
 
+	function findNodeLeft(node, condition) {
+		while (node && !condition(node)) {
+			node = node.nextSibling;
+		}
+		return node;
+	}
+
 	/**
 	 * Checks if the given editable is a valid container for paragraphs.
 	 *
@@ -422,11 +516,37 @@ define([
 	 * @return {boolean} False if the editable may not contain paragraphs
 	 */
 	function allowNestedParagraph(editable) {
-		if (editable.obj.prop("tagName") === "SPAN" ||
-				editable.obj.prop("tagName") === "P") {
-			return false;
+		if (editable.obj[0] && Dom.allowsNesting(editable.obj[0], jQuery("<p>")[0])) {
+			return true;
 		}
-		return true;
+		return false;
+	}
+
+	/**
+	 * Removes a strange characters from at the beginning and end of the string
+	 * 
+	 * @param {String} str A string to be trimmed
+	 * 
+	 * @return {String}
+	 */
+	function trimWhitespaceCharacters(str) {
+		return str
+			.replace(WSP_CHARACTERS_LEFT, '')
+			.replace(WSP_CHARACTERS_RIGHT, '')
+			.replace(ZWSP_CHARACTERS_LEFT, '')
+			.replace(ZWSP_CHARACTERS_RIGHT, '');
+	}
+
+	function isUnrenderedNode(node) {
+		if (3 === node.nodeType && 0 === node.data.length) {
+			return true;
+		}
+		if ((node === node.parentNode.lastChild)
+				&& isBlock(node.parentNode)
+					&& 'BR' === node.nodeName) {
+			return true;
+		}
+		return isWSPorZWSPNode(node);
 	}
 
 	// TODO This list is incomplete but should look something like
@@ -476,7 +596,12 @@ define([
 		isEmpty: isEmpty,
 		isProppedBlock: isProppedBlock,
 		isEditingHost: isEditingHost,
+		findNodeLeft: findNodeLeft,
 		findNodeRight: findNodeRight,
-		allowNestedParagraph: allowNestedParagraph
+		allowNestedParagraph: allowNestedParagraph,
+		trimWhitespaceCharacters: trimWhitespaceCharacters,
+		isWSPorZWSPNode: isWSPorZWSPNode,
+		isWSPorZWSPText: isWSPorZWSPText,
+		isUnrenderedNode: isUnrenderedNode
 	};
 });
