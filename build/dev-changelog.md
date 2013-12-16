@@ -5,8 +5,6 @@ All changes are categorized into one of the following keywords:
                usage, or intent of an existing one.
 - **ENHANCEMENT**: The change improves the software, but otherwise makes no
                    functional change to any feature.
-----
-
 
 - **BUGFIX**: core: Aloha incorrectly reported that Chrome was not supported.
 - **ENHANCEMENT**: state-override: when pressing a formatting
@@ -60,3 +58,15 @@ All changes are categorized into one of the following keywords:
 
 	This event will not be broadcasted when Ephemera.ephemera() is
 	accessed as a getter.
+
+- **BUGFIX**: selection: modified to allow nested tables
+
+- **BUGFIX**: ephemera: javascript error when an editable contains SVG elements
+
+- **BUGFIX**: tab/next focuses invisible paste handler div
+
+- **BUGFIX**: paste: not working, or inserting paragraphs
+
+	When the css for the metaview plugin was not included, pasting
+	didn't work, and when the css was included, the paste plugin
+	wrapped additional paragraphs around the content.

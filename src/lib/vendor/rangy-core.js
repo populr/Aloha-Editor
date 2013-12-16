@@ -84,7 +84,7 @@
 			config: {
 				alertOnWarn: false,
 				// Note: this was set to true, see issue https://github.com/alohaeditor/Aloha-Editor/issues/474
-				preferTextRange: true
+				preferTextRange: false
 			}
 		};
 
