@@ -259,13 +259,9 @@ define([
 		if (range) {
 			var content = $clipboard.html();
 
-			// Because IE inserts an insidious nbsp into the content during
-			// pasting that needs to be removed.  Leaving it would otherwise
-			// result in an empty paragraph being created right before the
-			// pasted content when the pasted content is a paragraph.
-			if (IS_IE && /^&nbsp;/.test(content)) {
-				content = content.substring(6);
-			}
+			// trailing spaces were being converted to &nbsp; when pasting, causing
+			// problems with word breaks
+			content = content.replace(/&nbsp;/g, ' ')
 
 			restoreSelection(range);
 			prepRangeForPaste(range);
