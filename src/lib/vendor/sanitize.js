@@ -56,7 +56,8 @@ function Sanitize(){
   this.filters = options.filters ? options.filters : [];
 }
 
-Sanitize.REGEX_PROTOCOL = /^([A-Za-z0-9\+\-\.\&\;\*\s]*?)(?:\:|&*0*58|&*x0*3a)/i
+// modified to support Populr api tags and // style urls
+Sanitize.REGEX_PROTOCOL = /^([A-Za-z0-9\+\-\.\&\;\*\s\{\/]*?)(?:\:|&*0*58|&*x0*3a)/i
 Sanitize.RELATIVE = '__relative__'; // emulate Ruby symbol with string constant
 
 Sanitize.prototype.clean_node = function(container) {
